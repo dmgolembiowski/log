@@ -1,6 +1,7 @@
 use crate::sqlite;
 use crate::mysql;
 use crate::conf::{ConfFile, ledger_conffile_abspath};
+use crate::record::SQLRecord;
 
 pub fn open_ledger(ledger_name: &String) {
 

@@ -18,7 +18,7 @@ pub fn open_sqlite_connection(abspath: &String) -> Connection {
     let sqldb = validate_connection(result_sqldb);
     sqldb
 }
-//pub fn validate_connection(result_sqldb: Result<Connection, rusqlite::Error>) -> Connection {
+
 pub fn validate_connection(result_sqldb: Result<Connection, RusqliteError>) -> Connection {
     match result_sqldb {
         Ok(conn) => conn,
@@ -44,6 +44,41 @@ pub fn close_sqlite_connection(sqldb: Connection) -> Result<(), (Connection, Rus
     sqldb.close() 
 }
 
+
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
+
+// The output is wrapped in a Result to allow matching on errors
+// Returns an Iterator to the Reader of the lines of the file.
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
+}
+
+
+use crate::record::SQLRecord;
 pub fn build_first_sqlite_table(sqldb: &Connection) { 
-   create_table(sqldb, String::from("LEDGER"));
+    
+    // Make the table
+    
+    let mut line_no    = 1;
+    create_table(sqldb, String::from("LEDGER"));
+    let mut rows: Vec<SQLRecord> = vec!();
+    
+    // Open the template file and iterate over the lines to make two SQLRecords
+    
+    if let Ok(lines) = read_lines("templates/ledger.log") {
+        for line in lines {
+            if let Ok(row) = line {
+                println!("{}", &row);
+                rows.push(SQLRecord::new(String::from("LEDGER"), row, line_no));
+                line_no += 1;
+            }
+        }
+    }
+
+    // Now must insert each of the SQLRecords into the SQLite database:
+
 }
