@@ -44,7 +44,6 @@ pub fn close_sqlite_connection(sqldb: Connection) -> Result<(), (Connection, Rus
     sqldb.close() 
 }
 
-pub fn build_first_sqlite_table(
-    sqldb: &rusqlite::Connection,
-    ledger_name: &String) {  
+pub fn build_first_sqlite_table(sqldb: &Connection) { 
+   create_table(sqldb, String::from("LEDGER"));
 }

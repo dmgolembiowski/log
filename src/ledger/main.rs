@@ -47,7 +47,7 @@ pub fn open_ledger(ledger_name: &String) {
                                by the sqlite connection.
                             */
                             
-                            sqlite::build_first_sqlite_table(&sqldb, &ledger_name);
+                            sqlite::build_first_sqlite_table(&sqldb);
                             println!("Setting up the initial configurations for the SQLite database...");
                         
                         }
