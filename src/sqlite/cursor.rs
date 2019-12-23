@@ -80,5 +80,7 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
     }
 
     // Now must insert each of the SQLRecords into the SQLite database:
-
+    for sql_record in rows {
+        sql_record.insert_sqlite(sqldb);
+    }
 }
