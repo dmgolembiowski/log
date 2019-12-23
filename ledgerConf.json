@@ -4,5 +4,6 @@
     "USE_DEDICATED_SERVER": false, 
     "USER": null, 
     "PASS": null,
-    "TEMPLATES_ROOT": "/home/david/log/templates/"
+    "TEMPLATES_ROOT": "/home/david/log/templates/",
+    "TMP_FOLDER_ROOT": "/home/david/log/tmp/"
 }
