@@ -3,5 +3,6 @@
     "DEDICATED_SERVER_DSN": "Server=myServerAddress;Port=1234;Database=myDataBase;Uid=myUsername;Pwd=myPassword;", 
     "USE_DEDICATED_SERVER": false, 
     "USER": null, 
-    "PASS": null
+    "PASS": null,
+    "TEMPLATES_ROOT": "/home/david/log/templates/"
 }
