@@ -1,9 +1,11 @@
 #![allow(dead_code)]
-//use log::argparse;
-use rusqlite;
-use rusqlite::{params, Connection};
+use log::argparse;
+use log::sqlite;
+//use rusqlite;
+//use rusqlite::{params, Connection};
 //use rusqlite::Result as SQLiteResult;
 //use std::process::Command;
+
 use std::boxed::Box;
 use serde_json;
 use std::error::Error;
@@ -23,11 +25,6 @@ impl ConfFile {
         Ok(obj)
     }
 }
-
-fn open_configuration_file() {}
-
-fn get_ledger_by_name() {}
-
 #[derive(Debug)]
 pub struct SQLRecord {
     table_name : Option<String>,
@@ -50,7 +47,7 @@ impl SQLRecord {
 pub fn generate_temp_file(ledger_name: String) -> String {
     ledger_name
 }
-
+/*
 pub fn create_table(sqldb: &Connection, table_name: String) {
     let exec_string = format!( 
         "CREATE TABLE {} (
@@ -62,6 +59,7 @@ pub fn create_table(sqldb: &Connection, table_name: String) {
         Err(_err)    => ()
     }
 }
+
 
 pub fn open_sqlite_connection(abspath: &String) -> Connection {
     let result_sqldb = Connection::open(abspath);
@@ -94,7 +92,7 @@ pub fn close_sqlite_connection(sqldb: Connection) -> Result<(), (Connection, rus
 {
     sqldb.close() 
 }
-
+*/
 pub fn ledger_conffile_abspath() -> String{
     let conffile: Result<String, env::VarError> = env::var("LEDGER_CONF_PATH");
     conffile.unwrap()
@@ -128,9 +126,9 @@ pub fn open_ledger(ledger_name: &String) {
                         );
                         println!("sqlite_path = {:?}", &sqlite_path);                    
                         // And connect to the local database file
-                        let sqldb: rusqlite::Connection = open_sqlite_connection(&sqlite_path);
+                        let sqldb: rusqlite::Connection = sqlite::open_sqlite_connection(&sqlite_path);
                         // Getting in some practice with booleans
-                        if !check_table_name(&sqldb, &ledger_name) {
+                        if !sqlite::check_table_name(&sqldb, &ledger_name) {
                             // table does not exist yet
                             println!("Creating first time SQLite default ledger");
                             /*
@@ -139,7 +137,7 @@ pub fn open_ledger(ledger_name: &String) {
                                it with functions into fields that can be easily manipulated
                                by the sqlite connection.
                             */
-                            build_first_sqlite_table(&sqldb, &ledger_name);
+                            sqlite::build_first_sqlite_table(&sqldb, &ledger_name);
                             println!("Setting up the initial configurations for the SQLite database...");
                         
                         }
@@ -147,11 +145,10 @@ pub fn open_ledger(ledger_name: &String) {
         }
     };
 }
-
+/*
 pub fn build_first_sqlite_table(
     sqldb: &rusqlite::Connection,
-    ledger_name: &String) {
-    
+    ledger_name: &String) {  
 }
 
 pub fn get_sysargs() -> Vec<Option<String>> {
@@ -163,7 +160,7 @@ pub fn get_sysargs() -> Vec<Option<String>> {
     }
     sys_argv
 }
-
+*/
 pub fn save_ledgers_to_db() {}
 
 fn translate_sql_resp_to_file() {}
@@ -185,7 +182,7 @@ fn main(){
     open_ledger(String::from(""));
     
 */
-    let _sys_argv = get_sysargs();
+    let _sys_argv = argparse::get_sysargs();
     open_ledger(&String::from("ledgerTest"));
 }
 
