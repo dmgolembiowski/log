@@ -1,9 +1,9 @@
 #![allow(dead_code)]
-
+//use log::argparse;
 use rusqlite;
 use rusqlite::{params, Connection};
-use rusqlite::Result as SQLiteResult;
-use std::process::Command;
+//use rusqlite::Result as SQLiteResult;
+//use std::process::Command;
 use std::boxed::Box;
 use serde_json;
 use std::error::Error;
@@ -14,15 +14,6 @@ use std::env;
 fn _connect_external_db(ledger_name: String) {
     println!("Accessing the {} log", ledger_name);
 }
-
-#[derive(Debug)]
-pub struct VimFile {
-    ledger_name   : Option<String>,
-    tmp_file_name : Option<String>,
-    rawlines      : Option<String>,
-    lines         : Vec<Option<String>>
-}
-
 pub struct ConfFile;
 impl ConfFile {
     pub fn load(path: &str) -> Result<Map<String, Value>, Box<dyn Error>> {
@@ -30,15 +21,6 @@ impl ConfFile {
         let parsed: Value = serde_json::from_str(&config)?;
         let obj: Map<String, Value> = parsed.as_object().unwrap().clone();
         Ok(obj)
-    }
-}
-
-impl VimFile {
-    fn new(ledger_name: Option<String>,
-           tmp_file_name: Option<String>,
-           rawlines: Option<String>,
-           lines: Vec<Option<String>>) -> VimFile {
-        VimFile {ledger_name, tmp_file_name, rawlines, lines}
     }
 }
 
@@ -91,7 +73,7 @@ pub fn open_sqlite_connection(abspath: &String) -> Connection {
 pub fn validate_connection(result_sqldb: Result<Connection, rusqlite::Error>) -> Connection {
     match result_sqldb {
         Ok(conn) => conn,
-        Err(error) => {
+        Err(_error) => {
             panic!("Oops, could not make SQLite DB connection.");
         }
     }
@@ -166,51 +148,12 @@ pub fn open_ledger(ledger_name: &String) {
     };
 }
 
-pub fn build_first_sqlite_table(sqldb: &rusqlite::Connection, ledger_name: &String) {
+pub fn build_first_sqlite_table(
+    sqldb: &rusqlite::Connection,
+    ledger_name: &String) {
     
 }
 
-pub fn vim_render(sys_argv: Vec<Option<String>>) {
-    // Use information provided by std::env::args
-    //use std::env::{args as sysargs, Args as Sysargs};
-    use std::env::args as sysargs;
-    let _sys_argv = sysargs().skip(1); // The iterator
-
-    /*Cases:
-      1) log
-      2) log algebra-notes
-      3) log -o geometry sociology
-      4) log -O geometry sociology
-      5) log geometry sociology
-      6) log crabmeat lightbulb eyegoop
-    
-    try:
-        sas = sys_argv.next()
-        assert((sas != "-o" || sys_argv != "-O"))
-    except AssertionError:
-        print("Not splitting windows")
-        if [[ "$sas" == "-o" ]]; then 
-    */
-    let _unused = sys_argv;
-}
-
-pub fn open_normal_vim(temporary_filename: &String) {
-    Command::new("vim").arg(temporary_filename)
-        .status()
-        .expect("Something went wrong");
-}
-
-fn open_vsplit_vim(_temporary_filenames: Vec<String>) {
-   Command::new("vim").arg("-O").arg("test")
-       .status()
-       .expect("Something went wrong");
-}
-
-fn open_hsplit_vim() {
-    Command::new("vim").arg("-o").arg("/home/david/logTest.txt")
-        .status()
-        .expect("Something went wrong");
-}
 pub fn get_sysargs() -> Vec<Option<String>> {
     use std::env::args as sysargs;
     let argv = sysargs().skip(1); // The iterator
