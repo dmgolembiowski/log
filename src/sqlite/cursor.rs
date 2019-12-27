@@ -19,7 +19,7 @@ pub fn open_sqlite_connection(abspath: &String) -> Connection {
     sqldb
 }
 
-pub fn validate_connection(result_sqldb: Result<Connection, RusqliteError>) -> Connection {
+pub fn validate_connection(result_sqldb: Result<Connection>) -> Connection {
     match result_sqldb {
         Ok(conn) => conn,
         Err(_error) => {
@@ -39,9 +39,9 @@ pub fn check_table_name(sqldb: &rusqlite::Connection, tablename: &String) -> boo
     }
 }
 // pub fn close_sqlite_connection(sqldb: Connection) -> Result<(), (Connection, rusqlite::Error)> 
-pub fn close_sqlite_connection(sqldb: Connection) -> Result<(), (Connection, RusqliteError)> 
+pub fn close_sqlite_connection(sqldb: Connection) -> () 
 {
-    sqldb.close() 
+    sqldb.close(); 
 }
 
 
@@ -57,8 +57,8 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
-use crate::record::{SQLRecord, LineRows};
-
+use crate::record::{SQLRecord};
+use rusqlite::NO_PARAMS;
 pub fn build_first_sqlite_table(sqldb: &Connection) { 
     
     // Make the table
@@ -78,34 +78,29 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
             }
         }
     }
-    //let line_rows: LineRows = LineRows::new(rows);
-    //let copy = line_rows.clone();
+
     // Now must insert each of the SQLRecords into the SQLite database:
     for sql_record in rows {
-    //for sql_record in copy.rows {
         sql_record.insert_sqlite(sqldb);
     }
-    //line_rows
+}
+
+use rusqlite::Result;
+
+pub fn open_default_sqlite(sqldb: &Connection)
+    -> Result<Vec<(String, String)>>
+{
+    let mut stmt = sqldb.prepare("SELECT * FROM LEDGER")?;
+    let mut rows = stmt.query(NO_PARAMS)?;
+    let mut lines = vec!();
+    while let Some(line) = rows.next()? {
+        lines.push((line.get(0)?, line.get(1)?));
+    }
+    Ok(lines)
 }
 pub fn open_default_sqlite_table(sqldb: &Connection)
-//  -> Option<LineRows>
--> Result<()>
+    -> Vec<(String,String)>
 {
-    let mut rows: Vec<SQLRecord> = vec!();
-    //let line_rows: LineRows = LineRows::new(rows);
-    let mut select_stmt = sqldb.prepare("SELECT line, line_number FROM LEDGER");
-    #[derive(Debug)]
-    struct Record { line: String, line_number: String };
-    let select_iter = select_stmt.unwrap().query_map(
-        params![],
-        |record| {
-            Ok(Record {
-                line: record.get(0)?,
-                line_number: record.get(1)?,
-            })
-        })?;
-    for ledger_line in select_iter {
-        println!("Found {:?}", ledger_line.unwrap());
-    }
-    Ok(())
+   let lines: Result<Vec<(String, String)>> = open_default_sqlite(sqldb);
+   lines.unwrap()
 }
