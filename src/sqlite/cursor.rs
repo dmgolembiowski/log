@@ -57,13 +57,13 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
+use crate::record::{SQLRecord, LineRows};
 
-use crate::record::SQLRecord;
 pub fn build_first_sqlite_table(sqldb: &Connection) { 
     
     // Make the table
     
-    let mut line_no    = 1;
+    let mut line_no = 1;
     create_table(sqldb, String::from("LEDGER"));
     let mut rows: Vec<SQLRecord> = vec!();
     
@@ -78,9 +78,34 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
             }
         }
     }
-
+    //let line_rows: LineRows = LineRows::new(rows);
+    //let copy = line_rows.clone();
     // Now must insert each of the SQLRecords into the SQLite database:
     for sql_record in rows {
+    //for sql_record in copy.rows {
         sql_record.insert_sqlite(sqldb);
     }
+    //line_rows
+}
+pub fn open_default_sqlite_table(sqldb: &Connection)
+//  -> Option<LineRows>
+-> Result<()>
+{
+    let mut rows: Vec<SQLRecord> = vec!();
+    //let line_rows: LineRows = LineRows::new(rows);
+    let mut select_stmt = sqldb.prepare("SELECT line, line_number FROM LEDGER");
+    #[derive(Debug)]
+    struct Record { line: String, line_number: String };
+    let select_iter = select_stmt.unwrap().query_map(
+        params![],
+        |record| {
+            Ok(Record {
+                line: record.get(0)?,
+                line_number: record.get(1)?,
+            })
+        })?;
+    for ledger_line in select_iter {
+        println!("Found {:?}", ledger_line.unwrap());
+    }
+    Ok(())
 }

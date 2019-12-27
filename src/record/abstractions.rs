@@ -1,5 +1,6 @@
 use rusqlite::{Connection, Error as RusqliteError, params};
-#[derive(Debug)]
+
+#[derive(Clone, Debug)]
 pub struct SQLRecord {
     table_name :  String,
     line        : String,
@@ -21,11 +22,11 @@ impl SQLRecord {
     pub fn insert_sqlite(self, sqldb: &Connection) {
         let exec_string = format!(
             "INSERT INTO {} (line, line_number)
-            VALUES({}, {});", 
-            self.table_name,
-            self.line,
-            self.line_number);
-        match sqldb.execute(&*exec_string, params![],) {
+            VALUES (?1, ?2)", self.table_name); 
+            //self.table_name,
+            //self.line,
+            //self.line_number);
+        match sqldb.execute(&*exec_string, params![self.line, self.line_number],) {
             Ok(_inserted) => {
                 println!("The database was successfully populated.");
             },
@@ -34,6 +35,16 @@ impl SQLRecord {
                 panic!("Error at line 33: src/record/abstraction.rs");
             }
         }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct LineRows {
+    pub rows : Vec<SQLRecord>
+}
+impl LineRows {
+    pub fn new(line_rows: Vec<SQLRecord>) -> LineRows {
+        LineRows {rows: line_rows}
     }
 }
 

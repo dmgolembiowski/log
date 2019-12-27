@@ -3,7 +3,7 @@ use crate::mysql;
 use crate::conf::{ConfFile, ledger_conffile_abspath};
 use crate::record::SQLRecord;
 
-pub fn open_ledger(ledger_name: &String) {
+pub fn open_ledger_from_sqlite(ledger_name: &String) {
 
     // Get the configuration file path from the OS environment
     let configuration_file_path: String = ledger_conffile_abspath();

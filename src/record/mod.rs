@@ -1,2 +1,3 @@
 mod abstractions;
-pub use self::abstractions::SQLRecord;
+pub use self::abstractions::{SQLRecord,
+    LineRows};
