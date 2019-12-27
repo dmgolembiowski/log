@@ -42,23 +42,34 @@ pub fn vim_render(sys_argv: Vec<Option<String>>) -> Vec<Option<String>>{
 pub fn vim_save(temp_file_path: &String) {}
 
 use crate::sqlite;
-use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 
 pub fn generate_temp_file_from_sqlite(
     sqldb: &Connection,
     ledger_name: &String,
-    local_tmp_folder: &String) {
+    local_tmp_folder: &String) -> String {
+
     // Step 1: Query the database for `table_name` := ledger_name 
-    let ledger_lines: Vec<(String, String)> = sqlite::open_sqlite_table(sqldb, ledger_name);
+    let ledger_lines: Vec<(String, i32)> = sqlite::open_sqlite_table(sqldb, ledger_name);
     
     // Step 2: Open a temp file and write each row to its corresponding line number in the file
-    let filename = String::from(format!("{}/{}.log", local_tmp_folder, ledger_name));
-    let log_file = File::open(filename).expect("Error: src/vim/util.rs: Unable to open file");
-    let mut f = BufWriter::new(log_file);
-    // Next iterate over each of the Vector slices and append them to the file
-    //
+    let filename = String::from(format!("{}{}.log", local_tmp_folder, ledger_name));
+    println!("File is {:?}", &filename);
+    let mut log_file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .append(true)
+        .open(&filename)
+        .unwrap();
 
+    // Next iterate over each of the vector slices and append them to the file
+    for line in ledger_lines {
+        let (content, _line_number) = line;
+        if let Err(e) = writeln!(log_file, "{}", content) {
+            eprintln!("Couldn't write to file: {}", e);
+        }
+    }
     // Step 3: Return an absolute path to the file (Profit)
-    
+    filename 
 }

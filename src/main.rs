@@ -15,7 +15,7 @@ fn main(){
     
 */
     let _sys_argv = argparse::get_sysargs();
-    ledger::open_ledger_from_sqlite(&String::from("ledgerTest"));
+    ledger::open_ledger_from_sqlite(&String::from("LEDGER"));
 }
 
 #[cfg(test)]

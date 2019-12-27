@@ -42,7 +42,19 @@ pub fn open_ledger_from_sqlite(ledger_name: &String) {
                             sqlite::build_first_sqlite_table(&sqldb);
                         }
                         // Next pull down the database and make a file from it
-                        vim::generate_temp_file_from_sqlite(&sqldb, &ledger_name);
+                        let tmp_path = String::from(
+                            *&json_config
+                            .get(&*String::from("TMP_FOLDER_ROOT"))
+                            .unwrap()
+                            .as_str()
+                            .unwrap()
+                        );
+                        println!("tmp_folder_path = {:?}", &tmp_path);
+                        let path = vim::generate_temp_file_from_sqlite(
+                            &sqldb,
+                            &ledger_name,
+                            &tmp_path);
+                        vim::open_normal_vim(&path);
         }
     };
 }

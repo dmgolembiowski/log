@@ -73,6 +73,7 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
         for line in lines {
             if let Ok(row) = line {
                 println!("{}", &row);
+
                 rows.push(SQLRecord::new(String::from("LEDGER"), row, line_no));
                 line_no += 1;
             }
@@ -87,7 +88,7 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
 
 use rusqlite::Result;
 pub fn _open_sqlite_table(sqldb: &Connection, table_name: &String)
-    -> std::result::Result<std::vec::Vec<(String, String)>, rusqlite::Error>
+    -> std::result::Result<std::vec::Vec<(String, i32)>, rusqlite::Error>
 {
     let query = String::from(format!("SELECT * FROM {}", table_name));
     let mut stmt = sqldb.prepare(&query)?;
@@ -99,12 +100,12 @@ pub fn _open_sqlite_table(sqldb: &Connection, table_name: &String)
     Ok(lines)
 }
 
-pub fn open_sqlite_table(sqldb: &Connection, table_name: &String) -> Vec<(String, String)> {
-    let lines: Result<Vec<(String, String)>> = _open_sqlite_table(sqldb, table_name);
+pub fn open_sqlite_table(sqldb: &Connection, table_name: &String) -> Vec<(String, i32)> {
+    let lines: Result<Vec<(String, i32)>> = _open_sqlite_table(sqldb, table_name);
     lines.unwrap()
 }
 
-pub fn open_sqlite_default(sqldb: &Connection) -> Vec<(String, String)> {
+pub fn open_sqlite_default(sqldb: &Connection) -> Vec<(String, i32)> {
     let table_name = String::from("LEDGER");
     open_sqlite_table(sqldb, &table_name)
 }
