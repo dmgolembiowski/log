@@ -86,11 +86,11 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
 }
 
 use rusqlite::Result;
-
-pub fn open_default_sqlite(sqldb: &Connection)
-    -> Result<Vec<(String, String)>>
+pub fn _open_sqlite_table(sqldb: &Connection, table_name: &String)
+    -> std::result::Result<std::vec::Vec<(String, String)>, rusqlite::Error>
 {
-    let mut stmt = sqldb.prepare("SELECT * FROM LEDGER")?;
+    let query = String::from(format!("SELECT * FROM {}", table_name));
+    let mut stmt = sqldb.prepare(&query)?;
     let mut rows = stmt.query(NO_PARAMS)?;
     let mut lines = vec!();
     while let Some(line) = rows.next()? {
@@ -98,9 +98,13 @@ pub fn open_default_sqlite(sqldb: &Connection)
     }
     Ok(lines)
 }
-pub fn open_default_sqlite_table(sqldb: &Connection)
-    -> Vec<(String,String)>
-{
-   let lines: Result<Vec<(String, String)>> = open_default_sqlite(sqldb);
-   lines.unwrap()
+
+pub fn open_sqlite_table(sqldb: &Connection, table_name: &String) -> Vec<(String, String)> {
+    let lines: Result<Vec<(String, String)>> = _open_sqlite_table(sqldb, table_name);
+    lines.unwrap()
+}
+
+pub fn open_sqlite_default(sqldb: &Connection) -> Vec<(String, String)> {
+    let table_name = String::from("LEDGER");
+    open_sqlite_table(sqldb, &table_name)
 }

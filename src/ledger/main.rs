@@ -2,7 +2,7 @@ use crate::sqlite;
 use crate::mysql;
 use crate::conf::{ConfFile, ledger_conffile_abspath};
 use crate::record::SQLRecord;
-
+use crate::vim;
 pub fn open_ledger_from_sqlite(ledger_name: &String) {
 
     // Get the configuration file path from the OS environment
@@ -25,7 +25,8 @@ pub fn open_ledger_from_sqlite(ledger_name: &String) {
         _         => {
                         // Next, we extract the path to the sqlite database
 
-                        let sqlite_path = String::from(*&json_config
+                        let sqlite_path = String::from(
+                            *&json_config
                             .get(&*String::from("SQLITE_DATABASE_PATH"))
                             .unwrap()
                             .as_str()
@@ -37,22 +38,11 @@ pub fn open_ledger_from_sqlite(ledger_name: &String) {
                         
                         // Getting in some practice with booleans
                         if !sqlite::check_table_name(&sqldb, &ledger_name) {
-
                             // table does not exist yet
-                            println!("Creating first time SQLite default ledger");
-                            
-                            /*
-                               Call a function that opens the templates folder
-                               and extracts the default ledger file. Then, process
-                               it with functions into fields that can be easily manipulated
-                               by the sqlite connection.
-                            */
-                            
                             sqlite::build_first_sqlite_table(&sqldb);
-                            println!("Setting up the initial configurations for the SQLite database...");
-                        
                         }
-                        // gen_vim_session();
+                        // Next pull down the database and make a file from it
+                        vim::generate_temp_file_from_sqlite(&sqldb, &ledger_name);
         }
     };
 }
