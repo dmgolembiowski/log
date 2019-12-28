@@ -31,6 +31,26 @@ impl SQLRecord {
             }
         }
     }
+    pub fn update_sqlite(self, sqldb: &Connection) {
+        /* UPDATE table
+         * SET column_1 = new_value_1,
+         *     column_2 = new_value_2
+         * WHERE 
+         *     search_condition;
+         */
+        let update_stmt = format!(
+            "UPDATE {}
+            SET line = ?1
+            WHERE line_number = ?2",
+            self.table_name);
+        match sqldb.execute(&*update_stmt, params![self.line, self.line_number],) {
+            Ok(_updated) => {()},
+            Err(_e)      => {
+                println!("The sqlite database file could not have its records updated.");
+                panic!("Error at line 40 of src/record/abstractions.rs");
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
