@@ -23,13 +23,8 @@ impl SQLRecord {
         let exec_string = format!(
             "INSERT INTO {} (line, line_number)
             VALUES (?1, ?2)", self.table_name); 
-            //self.table_name,
-            //self.line,
-            //self.line_number);
         match sqldb.execute(&*exec_string, params![self.line, self.line_number],) {
-            Ok(_inserted) => {
-                println!("The database was successfully populated.");
-            },
+            Ok(_inserted) => {()},
             Err(_e) => {
                 println!("The sqlite database file could not have its records added. Closing.");
                 panic!("Error at line 33: src/record/abstraction.rs");
