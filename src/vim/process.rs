@@ -1,11 +1,13 @@
 use std::process::Command;
+use crate::vim::save_tmp_file_to_sqlite;
+use rusqlite::Connection;
 
-pub fn open_normal_vim(temporary_filename: &String) {
+pub fn open_normal_vim(temporary_filename: &String, ledger_name: &String, sqldb : &Connection)  {
     let mut cmd = Command::new("vim");
     if let Ok(mut child) = cmd.arg(&temporary_filename).spawn() {
         child.wait().expect("Command was not running");
         println!("Saving...");
-        // Now we have to open a file reader and save the file's lines to the database
+        save_tmp_file_to_sqlite(temporary_filename, ledger_name, sqldb);
     } else {
         println!("Vim failed to start");
     }

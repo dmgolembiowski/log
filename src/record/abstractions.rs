@@ -40,10 +40,11 @@ impl SQLRecord {
          */
         let update_stmt = format!(
             "UPDATE {}
-            SET line = ?1
-            WHERE line_number = ?2",
+            SET line = ?1,
+                line_number = ?2
+            WHERE line_number = ?3",
             self.table_name);
-        match sqldb.execute(&*update_stmt, params![self.line, self.line_number],) {
+        match sqldb.execute(&*update_stmt, params![self.line, self.line_number, self.line_number],) {
             Ok(_updated) => {()},
             Err(_e)      => {
                 println!("The sqlite database file could not have its records updated.");

@@ -37,11 +37,20 @@ pub fn open_ledger_from_sqlite(ledger_name: &String) {
                         let sqldb: rusqlite::Connection = sqlite::open_sqlite_connection(&sqlite_path);
                         
                         // Getting in some practice with booleans
+                        /*
                         if !sqlite::check_table_name(&sqldb, &ledger_name) {
                             // table does not exist yet
                             sqlite::build_first_sqlite_table(&sqldb);
                         }
+                        */
+                        let table_found: bool = sqlite::check_table(&sqldb, &ledger_name);
+                        //println!("{:?}", table_found);
+                        //panic!("Break");
                         // Next pull down the database and make a file from it
+                        if !table_found {
+                            sqlite::build_first_sqlite_table(&sqldb);
+                        }
+                        
                         let tmp_path = String::from(
                             *&json_config
                             .get(&*String::from("TMP_FOLDER_ROOT"))
@@ -54,7 +63,7 @@ pub fn open_ledger_from_sqlite(ledger_name: &String) {
                             &sqldb,
                             &ledger_name,
                             &tmp_path);
-                        vim::open_normal_vim(&path);
+                        vim::open_normal_vim(&path, &ledger_name, &sqldb);
         }
     };
 }

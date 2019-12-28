@@ -39,7 +39,49 @@ pub fn vim_render(sys_argv: Vec<Option<String>>) -> Vec<Option<String>>{
     */
     sys_argv
 }
-pub fn vim_save(temp_file_path: &String) {}
+
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::path::Path;
+
+pub fn load_tmp_file(filename: impl AsRef<Path>) -> Vec<String> {
+    let file = File::open(filename).expect("No such file could be found");
+    let buf = BufReader::new(file);
+    buf.lines()
+        .map(|l| l.expect("Could not parse line"))
+        .collect()
+}
+use crate::record::SQLRecord;
+pub fn save_tmp_file_to_sqlite(
+    filename: impl AsRef<Path>, 
+    ledger_name: &String,
+    sqldb: &Connection) {
+    
+    // First gather lines from the tmp file with the given name
+    let mut records: Vec<SQLRecord> = vec!();
+    let mut line_no = 1;  
+    let lines: Vec<String> = load_tmp_file(&filename);
+     
+    // Next save the lines to the sqlite instance
+    for line in lines {
+        if let row = line {
+            records.push(SQLRecord::new(ledger_name.to_string(), row, line_no));
+            line_no += 1;
+        }
+    }
+    for sql_record in records {
+        sql_record.update_sqlite(sqldb);
+    }
+    // Finally, remove the temporary file from the tmp/ folder
+    match std::fs::remove_file(filename) {
+        Ok(_worked) => {()},
+        Err(_e) => {
+            println!("Failed to remove the file! Run `rm tmp/LEDGER.log`");
+        }
+    }
+}
+
 
 use crate::sqlite;
 use std::fs::OpenOptions;

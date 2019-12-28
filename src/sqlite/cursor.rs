@@ -5,7 +5,8 @@ pub fn create_table(sqldb: &Connection, table_name: String) {
         "CREATE TABLE {} (
                 line        TEXT,
                 line_number INTEGER
-                )", table_name);
+                )
+        ", table_name);
     match sqldb.execute(&*exec_string, params![],) {
         Ok(_created) => (),
         Err(_err)    => ()
@@ -33,11 +34,37 @@ pub fn create_new_sqlite(abspath: &String) -> Connection {
 }
 
 pub fn check_table_name(sqldb: &rusqlite::Connection, tablename: &String) -> bool {
-    match sqldb.execute(&*format!("SELECT 1 FROM {}", tablename), params![],) {
+    //let test_stmt = format!("SELECT name FROM sqlite_master WHERE type='table' AND name='{}';", tablename);
+    //match sqldb.execute(&*test_stmt, params![],) {
+    match sqldb.execute(
+    "SELECT CASE
+      WHEN ((SELECT name FROM sqlite_master WHERE type='table' AND name='LEDGER') IS NULL)
+      THEN RAISE (FAIL, 'The table is not present')
+     END;", params![],) {
         Ok(_table_exists) => true, // Therefore, should not create new table
-        Err(_err)         => false, //           should create new table
+        Err(_err)         => { println!("Table doesn't exist. Creating...");
+            false}, //           should create new table
     }
 }
+
+pub fn _check_table(sqldb: &rusqlite::Connection, table_name: &String) -> Result<Vec<String>>{
+    let query = String::from(format!("SELECT * FROM {}", table_name));
+    let mut stmt = sqldb.prepare(&query)?;
+    let mut rows = stmt.query(NO_PARAMS)?;
+    let mut lines = vec!();
+    while let Some(line) = rows.next()? {
+        lines.push(line.get(0)?);
+    }
+    Ok(lines)
+}
+
+pub fn check_table(sqldb: &rusqlite::Connection, table_name: &String) -> bool {
+    match _check_table(sqldb, table_name) {
+        Ok(_something) => true,
+        Err(_err) => false
+    }
+}
+
 // pub fn close_sqlite_connection(sqldb: Connection) -> Result<(), (Connection, rusqlite::Error)> 
 pub fn close_sqlite_connection(sqldb: Connection) -> () 
 {
@@ -72,8 +99,6 @@ pub fn build_first_sqlite_table(sqldb: &Connection) {
     if let Ok(lines) = read_lines("templates/ledger.log") {
         for line in lines {
             if let Ok(row) = line {
-                println!("{}", &row);
-
                 rows.push(SQLRecord::new(String::from("LEDGER"), row, line_no));
                 line_no += 1;
             }

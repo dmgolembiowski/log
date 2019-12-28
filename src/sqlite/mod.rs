@@ -7,4 +7,5 @@ pub use self::cursor::{ create_table,
                         close_sqlite_connection,
                         build_first_sqlite_table,
                         open_sqlite_table,
-                        open_sqlite_default};
+                        open_sqlite_default,
+                        check_table};
