@@ -35,9 +35,10 @@ pub fn vim_render(sys_argv: Vec<Option<String>>) -> Vec<Option<String>>{
         assert((sas != "-o" || sys_argv != "-O"))
     except AssertionError:
         print("Not splitting windows")
-        if [[ "$sas" == "-o" ]]; then 
+        if [[ "$sas" == "-o" ]]; then
+            sys_argv
     */
-    sys_argv
+
 }
 
 use std::fs::File;
@@ -86,6 +87,14 @@ pub fn save_tmp_file_to_sqlite(
 use crate::sqlite;
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
+
+pub fn tmp_file_header(ledger_name: &String) -> () {
+    let mut title_length: u32 = 0;
+    for _character in ledger_name.chars() {
+        title_length += 1;
+    }
+    println!("The value of title_length = {:?}", title_length);
+}
 
 pub fn generate_temp_file_from_sqlite(
     sqldb: &Connection,

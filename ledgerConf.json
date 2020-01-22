@@ -5,5 +5,10 @@
     "USER": null, 
     "PASS": null,
     "TEMPLATES_ROOT": "/home/david/log/templates/",
-    "TMP_FOLDER_ROOT": "/home/david/log/tmp/"
+    "TMP_FOLDER_ROOT": "/home/david/log/tmp/",
+    "HOST": "secrets.com",
+    "PORT": 8080,
+    "POSTGRES_DATABASE": "ledgerdb",
+    "POSTGRES_USER": "log",
+    "POSTGRES_PASSWORD": "butWhatIfIsaidNoU"
 }

@@ -1,5 +1,5 @@
 use std::env::args as sysargs;
-pub fn get_sysargs() -> Vec<Option<String>> {
+pub fn get_sysargs() {
     let argv = sysargs().skip(1);
     let mut sys_argv: Vec<Option<String>> = vec!();
     for some_arg in argv {
